@@ -70,10 +70,9 @@ class ACMPipeline:
         item['month'] = month
         item['year'] = year
 
+        # todo 如果获取不到相应key会报错，考虑用try？
         # 拼接url
         # item['pdf_url'] = 'https://dl.acm.org' + item['pdf_url']
         item['video_url'] = 'https://dl.acm.org' + item['video_url']
-
-        print('!!!', item)
 
         return item

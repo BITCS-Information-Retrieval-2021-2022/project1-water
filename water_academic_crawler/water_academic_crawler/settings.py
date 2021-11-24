@@ -145,8 +145,8 @@ ITEM_PIPELINES = {
 # MongoDB
 MONGODB_HOST = "localhost"
 MONGODB_PORT = 27017
-MONGODB_NAME = "test"
-MONGODB_COLLECTION = "test"
+MONGODB_NAME = "academic_database"
+MONGODB_COLLECTION = "paper_information"
 
 # Log
 LOG_FILE = 'water_academic_crawler.log'
