@@ -10,6 +10,11 @@ from urllib import request
 
 import pymongo
 from scrapy.exceptions import DropItem
+from scrapy.http.request import Request
+from scrapy.pipelines.files import FilesPipeline
+
+from water_academic_crawler.items import PDFItem
+from water_academic_crawler.settings import HEADERS_EXAMPLE
 
 
 class WaterAcademicCrawlerPipeline:
@@ -31,6 +36,8 @@ class DBStoragePipeline(object):
         self.db_collection = self.db[collection_name]
 
     def process_item(self, item, spider):
+        if isinstance(item, PDFItem):
+            return item
         print('DBStoragePipeline', item)
 
         # 去重
@@ -75,4 +82,28 @@ class ACMPipeline:
         # item['pdf_url'] = 'https://dl.acm.org' + item['pdf_url']
         item['video_url'] = 'https://dl.acm.org' + item['video_url']
 
+        return item
+
+class PDFPipeline(FilesPipeline):
+
+    def get_media_requests(self, item, info):
+        if isinstance(item, PDFItem):
+            yield Request(url=item['file_urls'],
+                          headers=HEADERS_EXAMPLE,
+                          meta={'file_names': item['file_names']})
+
+    def file_path(self, request, response=None, info=None, *, item=None):
+        file_name = request.meta['file_names']
+        # file_name = re.sub(r'Session\s*\w+\s*-\s*', '', file_name)
+        # file_name = re.sub(r'SIGIR\s*\w*\s*-\s*', '', file_name)
+        # file_name = re.sub(r'\[[\x00-\x7F]+]\s*', '', file_name)  # 去掉中括号
+        # file_name = re.sub(r'(\([\x00-\x7F]*\))', '', file_name)  # 去掉小括号
+        # file_name = file_name.strip()
+        # file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
+        # file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
+        return file_name + '.pdf'
+
+    def item_completed(self, results, item, info):
+        if isinstance(item, PDFItem):
+            print(results, item['file_urls'])
         return item
