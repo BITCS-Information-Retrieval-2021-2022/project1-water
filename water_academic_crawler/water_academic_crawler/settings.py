@@ -147,8 +147,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # MongoDB
-# MONGODB_HOST = "10.108.21.50"
-MONGODB_HOST = "localhost"
+MONGODB_HOST = "10.108.21.50"
+# MONGODB_HOST = "localhost"
 MONGODB_PORT = 27017
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
