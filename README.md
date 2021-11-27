@@ -1,4 +1,10 @@
 # Project 1 - Water小组
+# 11/26 update
+已经实现了PDF下载的框架(PDFItem)，不必重新造轮子
+
+使用时实例化该类，指定`'file_names'` 和 `'file_urls'`两个字段后yield该对象即可
+
+
 
 本项目实现了一个xxx
 
