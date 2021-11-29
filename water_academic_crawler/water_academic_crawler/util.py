@@ -38,3 +38,18 @@ def get_filename(filename, suffix):
     file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
     file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
     return file_name + suffix
+
+
+def set_checkpoint(filepath, args, mode='w+'):
+    if not (isinstance(args, dict) and isinstance(mode, str)):
+        return False
+
+    with open(filepath, mode) as f:
+        json.dump(args, f)
+    return True
+
+
+def load_checkpoint(filepath):
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+    return data

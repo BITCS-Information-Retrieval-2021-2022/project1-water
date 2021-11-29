@@ -118,11 +118,10 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 # 值越小越先处理
 ITEM_PIPELINES = {
-    # 'water_academic_crawler.pipelines.WaterAcademicCrawlerPipeline': 300,
-    'water_academic_crawler.pipelines.PDFPipeline': 1,
     'water_academic_crawler.pipelines.ACMPipeline': 100,
-    'water_academic_crawler.pipelines.DownloadPDFPipeline': 200,
-    'water_academic_crawler.pipelines.DownloadVideoPipeline': 201,
+    'water_academic_crawler.pipelines.DeduplicatePipeline': 200,
+    # 'water_academic_crawler.pipelines.DownloadPDFPipeline': 300,
+    # 'water_academic_crawler.pipelines.DownloadVideoPipeline': 301,
     'water_academic_crawler.pipelines.DBStoragePipeline': 400,
 }
 
@@ -163,6 +162,9 @@ FILES_STORE = '../storage'
 FILES_URLS_FIELD = 'file_urls'
 FILES_RESULT_FIELD = 'files'
 FILES_EXPIRES = 120  # 120 days of delay for files expiration
+
+# ACM Digital Library settings
+ACM_CHECKPOINT_PATH = '../storage/checkpoints/ACM.json'
 
 # ScienceDirect settings
 CKPT_PATH = os.path.join('ckpt', 'ckpt.json')
