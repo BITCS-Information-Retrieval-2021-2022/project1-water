@@ -6,15 +6,19 @@
 
 # useful for handling different item types with a single interface
 import hashlib
-from urllib import request
 
 import pymongo
 from scrapy.exceptions import DropItem
 from scrapy.http.request import Request
 from scrapy.pipelines.files import FilesPipeline
+from scrapy.utils.misc import arg_to_iter
+from twisted.internet.defer import DeferredList
 
 from water_academic_crawler.items import PDFItem
 from water_academic_crawler.settings import HEADERS_EXAMPLE
+
+from water_academic_crawler.util import has_attr
+from water_academic_crawler.util import get_filename
 
 
 class WaterAcademicCrawlerPipeline:
@@ -38,7 +42,6 @@ class DBStoragePipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, PDFItem):
             return item
-        print('DBStoragePipeline', item)
 
         # 去重
         md5 = hashlib.md5(item['title'].encode(encoding='UTF-8')).hexdigest()
@@ -47,10 +50,8 @@ class DBStoragePipeline(object):
         }
         cursor = self.db_collection.find(query)
         if len(list(cursor)) != 0:
-            raise DropItem("查找到重复论文: %s" % item)
-
-        # 下载pdf
-        # request.urlretrieve(item['video_url'], filename='./' + md5 + '.mp4')
+            print("查找到重复论文: %s" % item['title'])
+            raise DropItem("查找到重复论文: %s" % item['title'])
 
         # 将数据插入到集合中
         item['_id'] = md5
@@ -64,28 +65,105 @@ class DBStoragePipeline(object):
 
 
 class ACMPipeline:
+    def get_month(self, mon):
+        month_dict = {
+            'January': '01',
+            'February': '02',
+            'March': '03',
+            'April': '04',
+            'May': '05',
+            'June': '06',
+            'July': '07',
+            'August': '08',
+            'September': '09',
+            'October': '10',
+            'November': '11',
+            'December': '12'
+        }
+        return month_dict[mon]
+
     def process_item(self, item, spider):
         if spider.name != 'ACM':
             return item
 
-        print('ACMPipeline', item)
-
         # 处理month和year字段
-        month_and_year = item['year']
-        month = month_and_year.split(' ')[0]
-        year = month_and_year.split(' ')[1]
-        item['month'] = month
-        item['year'] = year
+        if has_attr(item, 'year'):
+            month_and_year = item['year']
+            month = month_and_year.split(' ')[0]
+            year = month_and_year.split(' ')[1]
+            item['month'] = self.get_month(month)
+            item['year'] = year
 
-        # todo 如果获取不到相应key会报错，考虑用try？
+        # 列表形式存储作者
+        if has_attr(item, 'authors'):
+            author_list = item['authors'].split('|')
+            author_list.pop()
+            item['authors'] = author_list
+
         # 拼接url
-        # item['pdf_url'] = 'https://dl.acm.org' + item['pdf_url']
-        item['video_url'] = 'https://dl.acm.org' + item['video_url']
+        if has_attr(item, 'pdf_url'):
+            item['pdf_url'] = 'https://dl.acm.org' + item['pdf_url']
+        if has_attr(item, 'video_url'):
+            item['video_url'] = 'https://dl.acm.org' + item['video_url']
 
         return item
 
-class PDFPipeline(FilesPipeline):
 
+class DownloadPDFPipeline(FilesPipeline):
+    def process_item(self, item, spider):
+        if not has_attr(item, 'pdf_url'):
+            print(item['title'], "doesn't provide pdf url")
+            return item
+        info = self.spiderinfo
+        requests = arg_to_iter(self.get_media_requests(item, info))
+        dlist = [self._process_request(r, info, item) for r in requests]
+        dfd = DeferredList(dlist, consumeErrors=True)
+        return dfd.addCallback(self.item_completed, item, info)
+
+    def get_media_requests(self, item, info):
+        print('Trying to download pdf...')
+        yield Request(url=item['pdf_url'], meta={'file_names': item['title']})
+
+    def file_path(self, request, response=None, info=None, *, item=None):
+        file_name = request.meta['file_names']
+        return 'pdf/' + get_filename(file_name, '.pdf')
+
+    def item_completed(self, results, item, info):
+        if results[0][0]:
+            file_name = item['title']
+            print('Downloaded pdf for', file_name)
+            item['pdf_path'] = 'storage/pdf/' + get_filename(file_name, '.pdf')
+        return item
+
+
+class DownloadVideoPipeline(FilesPipeline):
+    def process_item(self, item, spider):
+        if not has_attr(item, 'video_url'):
+            print(item['title'], "doesn't provide video url")
+            return item
+        info = self.spiderinfo
+        requests = arg_to_iter(self.get_media_requests(item, info))
+        dlist = [self._process_request(r, info, item) for r in requests]
+        dfd = DeferredList(dlist, consumeErrors=True)
+        return dfd.addCallback(self.item_completed, item, info)
+
+    def get_media_requests(self, item, info):
+        print('Trying to download video...')
+        yield Request(url=item['video_url'], meta={'file_names': item['title']})
+
+    def file_path(self, request, response=None, info=None, *, item=None):
+        file_name = request.meta['file_names']
+        return 'video/' + get_filename(file_name, '.mp4')
+
+    def item_completed(self, results, item, info):
+        if results[0][0]:
+            file_name = item['title']
+            print('Downloaded video for', file_name)
+            item['video_path'] = 'storage/video/' + get_filename(file_name, '.mp4')
+        return item
+
+
+class PDFPipeline(FilesPipeline):
     def get_media_requests(self, item, info):
         if isinstance(item, PDFItem):
             yield Request(url=item['file_urls'],

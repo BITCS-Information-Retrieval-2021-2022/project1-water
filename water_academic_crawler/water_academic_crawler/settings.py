@@ -8,7 +8,6 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
 
-
 BOT_NAME = 'water_academic_crawler'
 
 SPIDER_MODULES = ['water_academic_crawler.spiders']
@@ -120,9 +119,11 @@ DOWNLOADER_MIDDLEWARES = {
 # 值越小越先处理
 ITEM_PIPELINES = {
     # 'water_academic_crawler.pipelines.WaterAcademicCrawlerPipeline': 300,
+    'water_academic_crawler.pipelines.PDFPipeline': 1,
     'water_academic_crawler.pipelines.ACMPipeline': 100,
+    'water_academic_crawler.pipelines.DownloadPDFPipeline': 200,
+    'water_academic_crawler.pipelines.DownloadVideoPipeline': 201,
     'water_academic_crawler.pipelines.DBStoragePipeline': 400,
-    'water_academic_crawler.pipelines.PDFPipeline': 1
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -147,8 +148,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # MongoDB
-MONGODB_HOST = "10.108.21.50"
-# MONGODB_HOST = "localhost"
+# MONGODB_HOST = "10.108.21.50"
+MONGODB_HOST = "localhost"
 MONGODB_PORT = 27017
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
@@ -157,13 +158,12 @@ MONGODB_COLLECTION = "paper_information"
 LOG_FILE = 'water_academic_crawler.log'
 LOG_LEVEL = 'DEBUG'
 
-#download PDF
-FILES_STORE = os.path.join('data', 'PDFs')
+# download
+FILES_STORE = '../storage'
 FILES_URLS_FIELD = 'file_urls'
 FILES_RESULT_FIELD = 'files'
-# 120 days of delay for files expiration
-FILES_EXPIRES = 120
+FILES_EXPIRES = 120  # 120 days of delay for files expiration
 
 # ScienceDirect settings
-CKPT_PATH = os.path.join('ckpt','ckpt.json')
+CKPT_PATH = os.path.join('ckpt', 'ckpt.json')
 CKPT_FLAG = False

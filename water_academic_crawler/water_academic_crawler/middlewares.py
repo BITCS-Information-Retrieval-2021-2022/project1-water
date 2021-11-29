@@ -111,5 +111,4 @@ class WaterAcademicCrawlerDownloaderMiddleware:
 class CrawlerUserAgentMiddleware(UserAgentMiddleware):
     def process_request(self, request, spider):
         agent = random.choice(list(FAKE_USER_AGENTS))
-        print('***user-agent: ', agent)
         request.headers.setdefault("User-Agent", agent)

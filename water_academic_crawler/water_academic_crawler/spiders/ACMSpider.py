@@ -9,16 +9,17 @@ class ACMSpider(Spider):
     name = 'ACM'
 
     def start_requests(self):
-        url = 'https://dl.acm.org/doi/10.1145/3404835.3462936'
-        yield Request(url, callback=self.ACM_parse)
+        url = 'https://dl.acm.org/doi/10.1145/3475992.3475997'
+        yield Request(url, callback=self.parse_paper, dont_filter=True)
 
-    def ACM_parse(self, response):
+    def parse_paper(self, response):
         paper = ItemLoader(item=AcademicItem(), selector=response)
 
         paper.add_xpath('title', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
                                  '2]/h1/text()')
         paper.add_xpath('abstract', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[2]/div[2]/div[2]/div['
                                     '1]/div/div[2]/p/text()')
+        # 拼接为|分割的字符串，在pipeline中处理
         authors_selector = response.xpath('//span[@class="loa__author-name"]/span/text()')
         authors = ''
         for s in authors_selector:
@@ -37,15 +38,18 @@ class ACMSpider(Spider):
         paper.add_value('source', 'ACM')
         paper.add_xpath('video_url', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[2]/div[2]/div[2]/div['
                                      '3]/div[2]/div/div/div/div[2]/div/div/div[2]/a[2]/@href')
-        # todo video_path
+        # video_path交由后续pipeline处理
+        paper.add_value('video_path', 'N/A')
         paper.add_xpath('thumbnail_url', '/html/body/div[1]/div/main/div[2]/article/div[2]/div[2]/div[2]/div[3]/div['
                                          '2]/div/div/div/div[1]/div/stream/@poster')
         paper.add_xpath('pdf_url', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
                                    '6]/div/div[2]/ul[2]/li[2]/a/@href')
-        # todo pdf_path
+        # pdf_path交由后续pipeline处理
+        paper.add_value('pdf_path', 'N/A')
         paper.add_xpath('inCitations', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
                                        '6]/div/div[1]/div/ul/li[1]/span/span[1]/text()')
-        paper.add_xpath('outCitations', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[2]/div[3]/div/ul/li['
-                                        '4]/a/span/text()')
+        outCitations_selector = response.xpath('//ol[contains(@class,"rlist references__list")]/li').extract()
+        outCitations = len(outCitations_selector)
+        paper.add_xpath('outCitations', str(outCitations))
 
         yield paper.load_item()
