@@ -21,13 +21,13 @@ class ACMSpider(Spider):
         self.page = checkpoint['page']
 
     def start_requests(self):
-        # url = 'https://dl.acm.org/action/doSearch?ConceptID=' + str(
-        #     self.current_concept) + '&expand=all&pageSize=20&startPage=' + str(
-        #     self.page) + '&ContentItemType=research-article'
-        # print('Crawling ConceptID: %d, page: %d' % (self.current_concept, self.page))
-        # yield Request(url, headers=HEADERS, callback=self.parse_result_page, dont_filter=True)
-        url = 'https://dl.acm.org/doi/10.1145/3485522'
-        yield Request(url, headers=HEADERS, callback=self.parse_paper, dont_filter=True, meta={'url': url})
+        url = 'https://dl.acm.org/action/doSearch?ConceptID=' + str(
+            self.current_concept) + '&expand=all&pageSize=20&startPage=' + str(
+            self.page) + '&ContentItemType=research-article'
+        print('Crawling ConceptID: %d, page: %d' % (self.current_concept, self.page))
+        yield Request(url, headers=HEADERS, callback=self.parse_result_page, dont_filter=True)
+        # url = 'https://dl.acm.org/doi/10.1145/3485522'
+        # yield Request(url, headers=HEADERS, callback=self.parse_paper, dont_filter=True, meta={'url': url})
 
     def parse_result_page(self, response):
         if response.status == 403:
