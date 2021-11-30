@@ -119,6 +119,7 @@ DOWNLOADER_MIDDLEWARES = {
 # 值越小越先处理
 ITEM_PIPELINES = {
     'water_academic_crawler.pipelines.ACMPipeline': 100,
+    'water_academic_crawler.pipelines.SpringerPipeline': 101,
     'water_academic_crawler.pipelines.DeduplicatePipeline': 200,
     # 'water_academic_crawler.pipelines.DownloadPDFPipeline': 300,
     # 'water_academic_crawler.pipelines.DownloadVideoPipeline': 301,
@@ -147,9 +148,10 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # MongoDB
-# MONGODB_HOST = "10.108.21.50"
-MONGODB_HOST = "localhost"
-MONGODB_PORT = 27017
+# MONGODB_HOST = "10.108.21.50"  # 远程
+MONGODB_HOST = "localhost"  # 本地
+MONGODB_PORT = 27017  # 测试
+# MONGODB_PORT = 27020  # 正式
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
 
@@ -165,6 +167,9 @@ FILES_EXPIRES = 120  # 120 days of delay for files expiration
 
 # ACM Digital Library settings
 ACM_CHECKPOINT_PATH = '../storage/checkpoints/ACM.json'
+
+# Springer settings
+SPRINGER_CHECKPOINT_PATH = '../storage/checkpoints/Springer.json'
 
 # ScienceDirect settings
 CKPT_PATH = os.path.join('ckpt', 'ckpt.json')
