@@ -26,7 +26,7 @@ class ACMSpider(Spider):
         #     self.page) + '&ContentItemType=research-article'
         # print('Crawling ConceptID: %d, page: %d' % (self.current_concept, self.page))
         # yield Request(url, headers=HEADERS, callback=self.parse_result_page, dont_filter=True)
-        url = 'https://dl.acm.org/doi/10.1145/3458817.3476142'
+        url = 'https://dl.acm.org/doi/10.1145/3485522'
         yield Request(url, headers=HEADERS, callback=self.parse_paper, dont_filter=True, meta={'url': url})
 
     def parse_result_page(self, response):
@@ -104,8 +104,7 @@ class ACMSpider(Spider):
                                    '6]/div/div[2]/ul[2]/li[2]/a/@href')
         # pdf_path交由后续pipeline处理
         paper.add_value('pdf_path', 'N/A')
-        paper.add_xpath('inCitations', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
-                                       '6]/div/div[1]/div/ul/li[1]/span/span[1]/text()')
+        paper.add_xpath('inCitations', '//span[contains(@class,"citation")]/span[1]/text()')
         outCitations_selector = response.xpath('//ol[contains(@class,"rlist references__list")]/li').extract()
         paper.add_xpath('outCitations', str(len(outCitations_selector)))
 
