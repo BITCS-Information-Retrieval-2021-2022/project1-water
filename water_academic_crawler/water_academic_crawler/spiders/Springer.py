@@ -14,16 +14,13 @@ class SpringerSpirder(Spider):
         super().__init__(**kwargs)
         checkpoint = load_checkpoint(SPRINGER_CHECKPOINT_PATH)
         print(checkpoint)
-        self.candidate_list = checkpoint['candidate_list']
-        self.current_word = checkpoint['current_word']
-        if self.current_word == '':
-            self.current_word = self.candidate_list.pop()
         self.page = checkpoint['page']
-        self.used_list = checkpoint['used_list']
+        self.year = checkpoint['year']
 
     def start_requests(self):
-        url = 'https://link.springer.com/search/page/' + str(
-            self.page) + '?facet-content-type=%22ConferencePaper%22&query=' + self.current_word
+        url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
+              + '&facet-content-type=%22ConferencePaper%22&facet-discipline=%22Computer+Science%22&date-facet-mode' \
+                '=between&facet-start-year=' + str(self.year)
         yield Request(url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': -1})
 
     def parse_result_page(self, response):
@@ -32,6 +29,7 @@ class SpringerSpirder(Spider):
                 response.xpath('//span[contains(@class,"number-of-pages")]/text()').extract()[0].replace(',', ''))
         else:
             total_page = response.request.meta['total_page']
+
         result_selectors = response.xpath('//*[@id="results-list"]/li')
         for s in result_selectors:
             paper_url = 'https://link.springer.com' + s.xpath('./h2/a/@href').extract()[0]
@@ -40,26 +38,24 @@ class SpringerSpirder(Spider):
                           meta={'url': paper_url, 'venue': venue})
         self.page = self.page + 1
         new_total = total_page
-        if self.page > 1:  # todo 应为total_page
-            self.used_list.append(self.current_word)
-            if len(self.candidate_list) > 0:
-                self.current_word = self.candidate_list.pop()
-            else:
-                self.set_checkpoint()
+        if self.page > 999 or self.page > total_page:
+            self.year = self.year + 1
+            if self.year > 2022:
+                print('=== Finish ===')
+                self.crawler.engine.close_spider(self, 'Finished.')
                 return
             self.page = 1
-            self.set_checkpoint()
             new_total = -1
-        list_url = 'https://link.springer.com/search/page/' + str(
-            self.page) + '?facet-content-type=%22ConferencePaper%22&query=' + self.current_word
+        self.set_checkpoint()
+        list_url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
+                   + '&facet-content-type=%22ConferencePaper%22&facet-discipline=%22Computer+Science%22&date-facet-mode' \
+                     '=between&facet-start-year=' + str(self.year)
         yield Request(url=list_url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': new_total})
 
     def set_checkpoint(self):
         checkpoint = {
-            'used_list': self.used_list,
-            'current_word': self.current_word,
-            'candidate_list': self.candidate_list,
             'page': self.page,
+            'year': self.year
         }
         print(checkpoint)
         set_checkpoint(SPRINGER_CHECKPOINT_PATH, checkpoint, 'w+')

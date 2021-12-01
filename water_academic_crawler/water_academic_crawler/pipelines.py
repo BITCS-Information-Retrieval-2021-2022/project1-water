@@ -133,6 +133,28 @@ class SpringerPipeline:
             author_list.pop()
             item['authors'] = author_list
 
+        # 处理type
+        if has_attr(item, 'type'):
+            type_str = item['type']
+            c_exp = r'((c|C)onference)|((p|P)roceeding)'
+            j_exp = r'((j|J)ournal)|((v|V)ol)|((c|C)ommunication)'
+            if re.search(c_exp, type_str) is not None:
+                item['type'] = 'conference'
+            elif re.search(j_exp, type_str) is not None:
+                item['type'] = 'journal'
+            elif has_attr(item, 'venue'):
+                type_str_venue = item['venue']
+                c_exp_venue = r"((c|C)onference)|((p|P)roceeding)|'|((w|W)orkshop)|([0-9][0-9])"
+                j_exp_venue = r'((j|J)ournal)|((v|V)ol)|((c|C)ommunication)|((b|B)ook)|((m|M)agazine)'
+                if re.search(c_exp_venue, type_str_venue) is not None:
+                    item['type'] = 'conference'
+                elif re.search(j_exp_venue, type_str_venue) is not None:
+                    item['type'] = 'journal'
+                else:
+                    item['type'] = 'conference'
+            else:
+                item['type'] = 'conference'
+
         return item
 
 
