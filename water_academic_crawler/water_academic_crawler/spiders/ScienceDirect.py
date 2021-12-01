@@ -2,23 +2,20 @@ from scrapy.spiders import Spider
 import json
 import scrapy
 from scrapy.crawler import CrawlerProcess
-from water_academic_crawler.items import AcademicItem, PDFItem
+from water_academic_crawler.items import AcademicItem
 import re
 import os
-from water_academic_crawler.util import save_ckpt, load_ckpt, get_printable_text
-from water_academic_crawler.settings import CKPT_PATH_SCIENCEDIRECT, CKPT_FLAG_SCIENCEDIRECT
+from water_academic_crawler.util import save_ckpt, \
+    load_ckpt, get_printable_text
+from water_academic_crawler.settings import \
+    CKPT_PATH_SCIENCEDIRECT, CKPT_FLAG_SCIENCEDIRECT
 
-import time as T
-
-HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) \
+HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) '
+                         'AppleWebKit/537.36 (KHTML, like Gecko) \
     Chrome/80.0.3987.116 Safari/537.36'}
 HEADERS_SEC = {'user-agent': 'Chrome/96.0.4664.45'}
-HEADERS_AUTH = {'Content-Type': 'application/json', 'Accept': 'application/json',
-                'x-els-apikey': '7f59af901d2d86f78a1fd60c1bf9426a'}
-HEADER_POST = {}
-HEADER_POST.update(HEADERS)
-HEADER_POST.update(HEADERS_AUTH)
-Api_Key = '7f59af901d2d86f78a1fd60c1bf9426a'  # '2827ed44c4e21ec313f7b086ae412420'
+# '2827ed44c4e21ec313f7b086ae412420'
+Api_Key = '7f59af901d2d86f78a1fd60c1bf9426a'
 
 
 class ScienceDirect(Spider):
@@ -36,12 +33,16 @@ class ScienceDirect(Spider):
 
         self.word_list_tmp.pop(0)
         # 构造url, get 方法
-        url = f'https://api.elsevier.com/content/search/sciencedirect?query={keyword}' \
-            f'&count=100&apiKey={Api_Key}&httpAccept=application%2Fjson'
+        url = f'https://api.elsevier.com/content/search/' \
+              f'sciencedirect?query={keyword}' \
+              f'&count=100&apiKey={Api_Key}&httpAccept=application%2Fjson'
         # 创建 scrapy.Request 实例
         if os.path.exists(CKPT_PATH_SCIENCEDIRECT) and CKPT_FLAG_SCIENCEDIRECT:
-            url, self.word_list, self.word_list_tmp = load_ckpt(CKPT_PATH_SCIENCEDIRECT)
-        req = scrapy.Request(url=url, headers=HEADERS, callback=self.parse)
+            url, self.word_list, self.word_list_tmp = \
+                load_ckpt(CKPT_PATH_SCIENCEDIRECT)
+        req = scrapy.Request(url=url,
+                             headers=HEADERS,
+                             callback=self.parse)
         yield req
 
     def parse(self, response):
@@ -72,7 +73,7 @@ class ScienceDirect(Spider):
             # item = self.func(item)
             try:
                 authors = paper['authors']['author']
-                if type(authors) == type(str()):
+                if isinstance(authors, str):
                     item['authors'] = [authors]
                 else:
                     item['authors'] = [x["$"] for x in authors]
@@ -84,7 +85,8 @@ class ScienceDirect(Spider):
             except KeyError:
                 pass
 
-            item['url'] = (paper['link'][1]['@href']).rstrip(r'?dgcid=api_sd_search-api-endpoint')
+            item['url'] = (paper['link'][1]['@href']) \
+                .rstrip(r'?dgcid=api_sd_search-api-endpoint')
             item['pdf_url'] = item['url'] + '/pdfft'
             item['pdf_path'] = 'storage/pdf/' + item['title'] + '.pdf'
             time = paper['load-date'].split('-')
@@ -92,15 +94,18 @@ class ScienceDirect(Spider):
             item['month'] = time[1]
             item['venue'] = paper['prism:publicationName']
             item['source'] = 'ScienceDirect'
-            # yield item
-            request_second = scrapy.Request(url=item['url'], headers=HEADERS,
-                                            callback=self.second_parse, meta={'item': item.deepcopy()})
-            yield request_second
+            yield item
+            # request_second = scrapy.Request(url=item['url'],
+            #                                 headers=HEADERS,
+            #                                 callback=self.second_parse,
+            #                                 meta={'item': item.deepcopy()})
+            # yield request_second
 
         for title in paper_list_tmp:
             words = title.split(' ')
             for word in words:
-                if (len(word) > 5 or (word.isupper() and len(word) > 2)) and len(self.word_list_tmp) < 1000:
+                if (len(word) > 5 or (word.isupper() and len(word) > 2)) \
+                        and len(self.word_list_tmp) < 1000:
                     if word in self.word_list:
                         continue
                     self.word_list.append(word)
@@ -110,13 +115,17 @@ class ScienceDirect(Spider):
 
         if not now_link == links[3]['@href']:
             # T.sleep(0.5)
-            req = scrapy.Request(url=next_link, headers=HEADERS, callback=self.parse)
-            save_ckpt(next_link, self.word_list, self.word_list_tmp, CKPT_PATH_SCIENCEDIRECT)
+            req = scrapy.Request(url=next_link,
+                                 headers=HEADERS, callback=self.parse)
+            save_ckpt(next_link, self.word_list,
+                      self.word_list_tmp, CKPT_PATH_SCIENCEDIRECT)
             yield req
         else:
-            url = f'https://api.elsevier.com/content/search/sciencedirect?query={self.word_list_tmp.pop(0)}' \
-                f'&count=100&apiKey={Api_Key}&httpAccept=application%2Fjson'
-            save_ckpt(url, self.word_list, self.word_list_tmp, CKPT_PATH_SCIENCEDIRECT)
+            url = f'https://api.elsevier.com/content/search/sciencedirect?' \
+                  f'query={self.word_list_tmp.pop(0)}' \
+                  f'&count=100&apiKey={Api_Key}&httpAccept=application%2Fjson'
+            save_ckpt(url, self.word_list,
+                      self.word_list_tmp, CKPT_PATH_SCIENCEDIRECT)
             req = scrapy.Request(url=url, headers=HEADERS, callback=self.parse)
             yield req
 
@@ -152,4 +161,4 @@ if __name__ == '__main__':
     })
 
     process.crawl(ScienceDirect)
-    process.start()  # the script will block here until the crawling is finished
+    process.start()
