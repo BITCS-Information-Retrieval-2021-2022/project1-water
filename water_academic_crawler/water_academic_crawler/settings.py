@@ -7,6 +7,7 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
+import json
 
 BOT_NAME = 'water_academic_crawler'
 
@@ -97,9 +98,10 @@ DOWNLOAD_DELAY = 3
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-# SPIDER_MIDDLEWARES = {
-#    'water_academic_crawler.middlewares.WaterAcademicCrawlerSpiderMiddleware': 543,
-# }
+SPIDER_MIDDLEWARES = {
+    # 'water_academic_crawler.middlewares.WaterAcademicCrawlerSpiderMiddleware': 543,
+    'water_academic_crawler.middlewares.ProxyPoolMiddleware': 543,
+}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -172,5 +174,11 @@ ACM_CHECKPOINT_PATH = '../storage/checkpoints/ACM.json'
 SPRINGER_CHECKPOINT_PATH = '../storage/checkpoints/Springer.json'
 
 # ScienceDirect settings
-CKPT_PATH = os.path.join('ckpt', 'ckpt.json')
-CKPT_FLAG = False
+CKPT_PATH_SCIENCEDIRECT = '../storage/checkpoints/ScienceDirect.json'
+CKPT_FLAG_SCIENCEDIRECT = True
+
+USE_PROXY = False
+if USE_PROXY:
+    PROXY_PATH = 'proxy/proxy.json'
+    with open(PROXY_PATH, 'r') as f:
+        IP_POOL = json.load(f)

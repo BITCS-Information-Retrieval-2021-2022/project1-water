@@ -11,7 +11,8 @@ from itemadapter import is_item, ItemAdapter
 # 模拟不同浏览器
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
 import random
-from water_academic_crawler.settings import FAKE_USER_AGENTS
+from water_academic_crawler.settings import FAKE_USER_AGENTS, USE_PROXY
+import json
 
 
 class WaterAcademicCrawlerSpiderMiddleware:
@@ -112,3 +113,16 @@ class CrawlerUserAgentMiddleware(UserAgentMiddleware):
     def process_request(self, request, spider):
         agent = random.choice(list(FAKE_USER_AGENTS))
         request.headers.setdefault("User-Agent", agent)
+
+
+class ProxyPoolMiddleware(object):
+
+    def __init__(self, ip=''):
+        self.ip = ip
+
+    def process_request(self, request, spider):
+        if USE_PROXY:
+            from water_academic_crawler.settings import IPPOOL
+            thisip = random.choice(IPPOOL)
+            print("ip proxy:" + thisip["proxy"])
+            request.meta["proxy"] = "http://" + thisip["proxy"]
