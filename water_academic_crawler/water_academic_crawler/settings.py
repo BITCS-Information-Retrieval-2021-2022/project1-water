@@ -121,7 +121,7 @@ ITEM_PIPELINES = {
     'water_academic_crawler.pipelines.ACMPipeline': 100,
     'water_academic_crawler.pipelines.SpringerPipeline': 101,
     'water_academic_crawler.pipelines.DeduplicatePipeline': 200,
-    'water_academic_crawler.pipelines.DownloadPDFPipeline': 300,
+    # 'water_academic_crawler.pipelines.DownloadPDFPipeline': 300,
     # 'water_academic_crawler.pipelines.DownloadVideoPipeline': 301,
     'water_academic_crawler.pipelines.DBStoragePipeline': 400,
 }
@@ -172,5 +172,5 @@ ACM_CHECKPOINT_PATH = '../storage/checkpoints/ACM.json'
 SPRINGER_CHECKPOINT_PATH = '../storage/checkpoints/Springer.json'
 
 # ScienceDirect settings
-CKPT_PATH = os.path.join('ckpt', 'ckpt.json')
-CKPT_FLAG = False
+CKPT_PATH_SCIENCEDIRECT = '../storage/checkpoints/ScienceDirect.json'
+CKPT_FLAG_SCIENCEDIRECT = True
