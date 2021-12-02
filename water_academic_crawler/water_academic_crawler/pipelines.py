@@ -27,7 +27,6 @@ class ACMPipeline:
         if has_attr(item, 'year'):
             date = item['year'].split(' ')
             month, year = '__N/A__', '__N/A__'
-            print(date)
             if len(date) == 2:
                 month = date[0]
                 year = date[1]
