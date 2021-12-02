@@ -25,9 +25,15 @@ class ACMPipeline:
 
         # 处理month和year字段
         if has_attr(item, 'year'):
-            month_and_year = item['year']
-            month = month_and_year.split(' ')[0]
-            year = month_and_year.split(' ')[1]
+            date = item['year'].split(' ')
+            month, year = '__N/A__', '__N/A__'
+            print(date)
+            if len(date) == 2:
+                month = date[0]
+                year = date[1]
+            if len(date) == 3:
+                month = date[1]
+                year = date[2]
             try:
                 item['month'] = get_month(month)
             except KeyError:

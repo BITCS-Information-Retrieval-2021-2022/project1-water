@@ -40,6 +40,7 @@ def get_month(mon):
         'Aug': '08',
         'September': '09',
         'Sept': '09',
+        'Sep': '09',
         'October': '10',
         'Oct': '10',
         'November': '11',

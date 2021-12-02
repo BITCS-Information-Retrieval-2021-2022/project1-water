@@ -88,8 +88,7 @@ class ACMSpider(Spider):
         paper.add_value('authors', authors)
         paper.add_value('doi', response.request.meta['url'].replace('https://dl.acm.org', 'https:/'))
         paper.add_value('url', response.request.meta['url'])
-        paper.add_xpath('year', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
-                                '4]/div/span[1]/span/text()')
+        paper.add_xpath('year', '//span[contains(@class,"CitationCoverDate")]/text()')
         paper.add_value('month', '__N/A__')
         # 交由后续pipeline进一步判断文章类型
         navigator_selectors = response.xpath('//*[@id="pb-page-content"]/div/header/div[4]/div/div/nav/a/text()')
