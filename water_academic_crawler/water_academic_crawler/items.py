@@ -45,9 +45,5 @@ class AcademicItem(scrapy.Item):
 
     # MongoDB主键
     _id = scrapy.Field()
-
-
-class PDFItem(scrapy.Item):
-    file_urls = scrapy.Field()
-    files = scrapy.Field()
-    file_names = scrapy.Field()
+    # 重启pdf下载标记
+    drop_pdf_flag = scrapy.Field()

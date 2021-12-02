@@ -68,8 +68,10 @@ def get_filename(filename, suffix):
     file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
     return file_name + suffix
 
-def get_printable_text(str):
-    return get_filename(str, '')
+
+def get_printable_text(s):
+    return get_filename(s, '')
+
 
 def set_checkpoint(filepath, args, mode='w+'):
     if not (isinstance(args, dict) and isinstance(mode, str)):

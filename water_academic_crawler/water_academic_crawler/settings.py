@@ -122,6 +122,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     'water_academic_crawler.pipelines.ACMPipeline': 100,
     'water_academic_crawler.pipelines.SpringerPipeline': 101,
+    # 'water_academic_crawler.pipelines.ScienceDirectPipeline': 102,
     'water_academic_crawler.pipelines.DeduplicatePipeline': 200,
     'water_academic_crawler.pipelines.DownloadPDFPipeline': 300,
     # 'water_academic_crawler.pipelines.DownloadVideoPipeline': 301,
@@ -150,10 +151,10 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # MongoDB
-# MONGODB_HOST = "10.108.21.50"  # 远程
-MONGODB_HOST = "localhost"  # 本地
-MONGODB_PORT = 27017  # 测试
-# MONGODB_PORT = 27020  # 正式
+MONGODB_HOST = "10.108.21.50"  # 远程
+# MONGODB_HOST = "localhost"  # 本地
+# MONGODB_PORT = 27017  # 测试
+MONGODB_PORT = 27020  # 正式
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
 
@@ -166,9 +167,11 @@ FILES_STORE = '../storage'
 FILES_URLS_FIELD = 'file_urls'
 FILES_RESULT_FIELD = 'files'
 FILES_EXPIRES = 120  # 120 days of delay for files expiration
+DOWNLOAD_WARNSIZE = 0
 
 # ACM Digital Library settings
 ACM_CHECKPOINT_PATH = '../storage/checkpoints/ACM.json'
+ACM_MAX_CONCEPT_ID = 65
 
 # Springer settings
 SPRINGER_CHECKPOINT_PATH = '../storage/checkpoints/Springer.json'

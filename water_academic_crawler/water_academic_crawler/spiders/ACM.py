@@ -2,7 +2,7 @@
 from scrapy import Request
 from scrapy.spiders import Spider
 from scrapy.loader import ItemLoader
-from water_academic_crawler.settings import ACM_CHECKPOINT_PATH
+from water_academic_crawler.settings import ACM_CHECKPOINT_PATH, ACM_MAX_CONCEPT_ID
 from water_academic_crawler.items import AcademicItem
 from water_academic_crawler.util import load_checkpoint, set_checkpoint
 
@@ -34,6 +34,7 @@ class ACMSpider(Spider):
             print('Banned by ACM Digit Library. Current ConceptID: %d, page: %s. Saving to checkpoint.' % (
                 self.current_concept, self.page))
             self.set_checkpoint()
+            self.crawler.engine.close_spider(self, 'Banned by ACM Digit Library.')
             return
 
         total_results = response.xpath('//*[@id="pb-page-content"]/div/main/div[1]/div/div[2]/div/div[1]/div[1]/span['
@@ -46,8 +47,12 @@ class ACMSpider(Spider):
             yield Request(url=paper_url, callback=self.parse_paper, meta={'url': paper_url}, dont_filter=True)
 
         self.page = self.page + 1
-        if self.page > total_pages:
+        if self.page > 100 or self.page > total_pages:  # ACM只返回前2000条数据，多了没有意义
             self.current_concept = self.current_concept + 1
+            if self.current_concept > ACM_MAX_CONCEPT_ID:
+                print('=== Finish ===')
+                self.crawler.engine.close_spider(self, 'Finished.')
+                return
             self.page = 0
         self.set_checkpoint()
         url = 'https://dl.acm.org/action/doSearch?ConceptID=' + str(
@@ -68,6 +73,7 @@ class ACMSpider(Spider):
             print('Banned by ACM Digit Library. Current ConceptID: %d, page: %s. Saving to checkpoint.' % (
                 self.current_concept, self.page))
             self.set_checkpoint()
+            self.crawler.engine.close_spider(self, 'Banned by ACM Digit Library.')
             return
 
         paper = ItemLoader(item=AcademicItem(), selector=response)
@@ -84,7 +90,7 @@ class ACMSpider(Spider):
         paper.add_value('url', response.request.meta['url'])
         paper.add_xpath('year', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
                                 '4]/div/span[1]/span/text()')
-        paper.add_value('month', 'N/A')
+        paper.add_value('month', '__N/A__')
         # 交由后续pipeline进一步判断文章类型
         navigator_selectors = response.xpath('//*[@id="pb-page-content"]/div/header/div[4]/div/div/nav/a/text()')
         navigator = ''
@@ -97,15 +103,15 @@ class ACMSpider(Spider):
         paper.add_xpath('video_url', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[2]/div[2]/div[2]/div['
                                      '3]/div[2]/div/div/div/div[2]/div/div/div[2]/a[2]/@href')
         # video_path交由后续pipeline处理
-        paper.add_value('video_path', 'N/A')
+        paper.add_value('video_path', '__N/A__')
         paper.add_xpath('thumbnail_url', '/html/body/div[1]/div/main/div[2]/article/div[2]/div[2]/div[2]/div[3]/div['
                                          '2]/div/div/div/div[1]/div/stream/@poster')
         paper.add_xpath('pdf_url', '//*[@id="pb-page-content"]/div/main/div[2]/article/div[1]/div[2]/div/div/div['
                                    '6]/div/div[2]/ul[2]/li[2]/a/@href')
         # pdf_path交由后续pipeline处理
-        paper.add_value('pdf_path', 'N/A')
+        paper.add_value('pdf_path', '__N/A__')
         paper.add_xpath('inCitations', '//span[contains(@class,"citation")]/span[1]/text()')
         outCitations_selector = response.xpath('//ol[contains(@class,"rlist references__list")]/li').extract()
-        paper.add_xpath('outCitations', str(len(outCitations_selector)))
+        paper.add_xpath('outCitations', str(int(len(outCitations_selector))))
 
         yield paper.load_item()
