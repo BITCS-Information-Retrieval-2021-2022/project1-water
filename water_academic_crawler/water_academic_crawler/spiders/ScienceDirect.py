@@ -9,6 +9,7 @@ from water_academic_crawler.util import save_ckpt, \
     load_ckpt, get_printable_text
 from water_academic_crawler.settings import \
     CKPT_PATH_SCIENCEDIRECT, CKPT_FLAG_SCIENCEDIRECT
+import time as T
 
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) \
@@ -94,12 +95,13 @@ class ScienceDirect(Spider):
             item['month'] = time[1]
             item['venue'] = paper['prism:publicationName']
             item['source'] = 'ScienceDirect'
-            yield item
-            # request_second = scrapy.Request(url=item['url'],
-            #                                 headers=HEADERS,
-            #                                 callback=self.second_parse,
-            #                                 meta={'item': item.deepcopy()})
-            # yield request_second
+            # yield item
+            request_second = scrapy.Request(url=item['url'],
+                                            headers=HEADERS,
+                                            callback=self.second_parse,
+                                            priority=20,
+                                            meta={'item': item.deepcopy()})
+            yield request_second
 
         for title in paper_list_tmp:
             words = title.split(' ')
@@ -142,13 +144,13 @@ class ScienceDirect(Spider):
             url = response.request.url + '/pdfft?md5=' + md5 + '&pid=' + pid
             item['pdf_url'] = url
 
-        abstract = re.findall(r"<div id=\"as005\">(.+?)</div>", string=body)
+        abstract = re.findall(r"Abstract</h2>(.+?)</div>", string=body)
         if abstract != []:
             abstract = re.sub(r"<.*?>", "", string=abstract[0])
             item['abstract'] = get_printable_text(abstract)
             item['pdf_path'] = 'storage/pdf/' + item['title'] + '.pdf'
 
-        yield item
+        return item
 
 
 if __name__ == '__main__':
