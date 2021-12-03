@@ -153,8 +153,8 @@ ITEM_PIPELINES = {
 # MongoDB
 MONGODB_HOST = "10.108.21.50"  # 远程
 # MONGODB_HOST = "localhost"  # 本地
-MONGODB_PORT = 27017  # 测试
-# MONGODB_PORT = 27020  # 正式
+# MONGODB_PORT = 27017  # 测试
+MONGODB_PORT = 27020  # 正式
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
 
