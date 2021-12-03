@@ -153,8 +153,8 @@ ITEM_PIPELINES = {
 # MongoDB
 MONGODB_HOST = "10.108.21.50"  # 远程
 # MONGODB_HOST = "localhost"  # 本地
-# MONGODB_PORT = 27017  # 测试
-MONGODB_PORT = 27020  # 正式
+MONGODB_PORT = 27017  # 测试
+# MONGODB_PORT = 27020  # 正式
 MONGODB_NAME = "academic_database"
 MONGODB_COLLECTION = "paper_information"
 
@@ -175,6 +175,7 @@ ACM_MAX_CONCEPT_ID = 65
 
 # Springer settings
 SPRINGER_CHECKPOINT_PATH = '../storage/checkpoints/Springer.json'
+SPRINGER_SUBDISCIPLINE_PATH = '../storage/SpringerSubDiscipline.txt'
 
 # ScienceDirect settings
 CKPT_PATH_SCIENCEDIRECT = '../storage/checkpoints/ScienceDirect.json'
@@ -185,3 +186,4 @@ if USE_PROXY:
     PROXY_PATH = 'proxy/proxy.json'
     with open(PROXY_PATH, 'r') as f:
         IP_POOL = json.load(f)
+

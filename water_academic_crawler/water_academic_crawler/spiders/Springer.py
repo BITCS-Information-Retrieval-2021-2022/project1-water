@@ -4,25 +4,28 @@ import math
 from scrapy import Request
 from scrapy.spiders import Spider
 from scrapy.loader import ItemLoader
-from water_academic_crawler.settings import SPRINGER_CHECKPOINT_PATH
+from water_academic_crawler.settings import SPRINGER_CHECKPOINT_PATH, SPRINGER_SUBDISCIPLINE_PATH
 from water_academic_crawler.items import AcademicItem
-from water_academic_crawler.util import load_checkpoint, set_checkpoint
+from water_academic_crawler.util import load_checkpoint, set_checkpoint, load_subdiscipline_list
 
 
 class SpringerSpirder(Spider):
     name = 'Springer'
+    subdiscipline_list=[]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.subdiscipline_list = load_subdiscipline_list(SPRINGER_SUBDISCIPLINE_PATH)
         checkpoint = load_checkpoint(SPRINGER_CHECKPOINT_PATH)
         print(checkpoint)
         self.page = checkpoint['page']
         self.year = checkpoint['year']
+        self.subdiscipline = checkpoint['subdiscipline']
 
     def start_requests(self):
-        url = 'https://link.springer.com/search/page/' + str(self.page) \
-              + '?facet-content-type=ConferencePaper&date-facet-mode=between&facet-start-year=' \
-              + str(self.year) + '&facet-end-year=' + str(self.year)
+        url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
+                   + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22'+self.subdiscipline_list[self.subdiscipline]+'%22&date-facet-mode' \
+                     '=between&facet-start-year=' + str(self.year)
         yield Request(url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': -1})
 
     def parse_result_page(self, response):
@@ -43,21 +46,25 @@ class SpringerSpirder(Spider):
         if self.page > 999 or self.page > total_page:
             self.year = self.year + 1
             if self.year > 2022:
-                print('=== Finish ===')
-                self.crawler.engine.close_spider(self, 'Finished.')
-                return
+                self.subdiscipline = self.subdiscipline + 1
+                self.year = 1930
+                if self.subdiscipline >= len(self.subdiscipline_list):
+                    print('=== Finish ===')
+                    self.crawler.engine.close_spider(self, 'Finished.')
+                    return
             self.page = 1
             new_total = -1
         self.set_checkpoint()
         list_url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
-                   + '&facet-content-type=%22ConferencePaper%22&facet-discipline=%22Computer+Science%22&date-facet-mode' \
+                   + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22'+self.subdiscipline_list[self.subdiscipline]+'%22&date-facet-mode' \
                      '=between&facet-start-year=' + str(self.year)
         yield Request(url=list_url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': new_total})
 
     def set_checkpoint(self):
         checkpoint = {
             'page': self.page,
-            'year': self.year
+            'year': self.year,
+            'subdiscipline': self.subdiscipline
         }
         print(checkpoint)
         set_checkpoint(SPRINGER_CHECKPOINT_PATH, checkpoint, 'w+')
