@@ -256,9 +256,11 @@ class DBStoragePipeline(object):
     def process_item(self, item, spider):
         # 更新下载信息（仅在重启pdf下载的情况下有效）
         if has_attr(item, 'drop_pdf_flag'):
-            to_update = {'pdf_path': item['pdf_path']}
-            self.db_collection.update({'_id': item['_id']}, {'$set': to_update})
-            print('Updated "%s" for "%s"' % (to_update, item['title']))
+            if has_attr(item, 'pdf_path'):
+                if not (item['pdf_path'] == '__N/A__'):
+                    to_update = {'pdf_path': item['pdf_path']}
+                    self.db_collection.update({'_id': item['_id']}, {'$set': to_update})
+                    print('Updated "%s" for "%s"' % (to_update, item['title']))
             return item
 
         # 处理__N/A__标记
