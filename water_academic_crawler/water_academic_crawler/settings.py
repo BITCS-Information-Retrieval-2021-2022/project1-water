@@ -186,4 +186,3 @@ if USE_PROXY:
     PROXY_PATH = 'proxy/proxy.json'
     with open(PROXY_PATH, 'r') as f:
         IP_POOL = json.load(f)
-

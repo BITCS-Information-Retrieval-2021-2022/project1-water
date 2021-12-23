@@ -11,7 +11,7 @@ from water_academic_crawler.util import load_checkpoint, set_checkpoint, load_su
 
 class SpringerSpirder(Spider):
     name = 'Springer'
-    subdiscipline_list=[]
+    subdiscipline_list = []
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -24,8 +24,9 @@ class SpringerSpirder(Spider):
 
     def start_requests(self):
         url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
-                   + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22'+self.subdiscipline_list[self.subdiscipline]+'%22&date-facet-mode' \
-                     '=between&facet-start-year=' + str(self.year)
+              + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22' + self.subdiscipline_list[
+                  self.subdiscipline] + '%22&date-facet-mode' \
+                                        '=between&facet-start-year=' + str(self.year)
         yield Request(url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': -1})
 
     def parse_result_page(self, response):
@@ -56,8 +57,9 @@ class SpringerSpirder(Spider):
             new_total = -1
         self.set_checkpoint()
         list_url = 'https://link.springer.com/search/page/' + str(self.page) + '?facet-end-year=' + str(self.year) \
-                   + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22'+self.subdiscipline_list[self.subdiscipline]+'%22&date-facet-mode' \
-                     '=between&facet-start-year=' + str(self.year)
+                   + '&facet-content-type=%22ConferencePaper%22&facet-sub-discipline=%22' + self.subdiscipline_list[
+                       self.subdiscipline] + '%22&date-facet-mode' \
+                                             '=between&facet-start-year=' + str(self.year)
         yield Request(url=list_url, callback=self.parse_result_page, dont_filter=True, meta={'total_page': new_total})
 
     def set_checkpoint(self):

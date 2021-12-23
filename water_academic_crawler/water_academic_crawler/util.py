@@ -88,6 +88,7 @@ def load_checkpoint(filepath):
         data = json.load(f)
     return data
 
+
 def load_subdiscipline_list(filepath):
     with open(filepath, 'r') as f:
         data = f.readlines()
