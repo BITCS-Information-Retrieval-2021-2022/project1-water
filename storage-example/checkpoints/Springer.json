@@ -1,8 +1,8 @@
 {
-  "// comment on year": "目前SpringerLink中year范围为1935-2022",
+  "// year": "目前SpringerLink中year范围为1935-2022",
   "year": 1935,
-  "// comment on page": "SpringerLink中每个年份的页码从1开始",
+  "// page": "SpringerLink中每个年份的页码从1开始",
   "page": 1,
-  "// comment on subdiscipline": "记录subdiscipline_list中的index，从0开始",
+  "// subdiscipline": "记录subdiscipline_list中的index，从0开始",
   "subdiscipline": 0
 }

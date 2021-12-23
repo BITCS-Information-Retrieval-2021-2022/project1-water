@@ -1,6 +1,6 @@
 {
-  "// comment on current_concept": "根据试验，conceptID从56开始，大约到2100左右",
+  "// current_concept": "根据试验，conceptID从56开始，大约到2100左右",
   "current_concept": 56,
-  "// comment on page": "ACM中每个conceptID的页码从0开始",
+  "// page": "ACM中每个conceptID的页码从0开始",
   "page": 0
 }
