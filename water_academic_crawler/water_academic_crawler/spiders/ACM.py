@@ -51,7 +51,6 @@ class ACMSpider(Spider):
             self.current_concept = self.current_concept + 1
             if self.current_concept > ACM_MAX_CONCEPT_ID:
                 print('=== Finish ===')
-                self.crawler.engine.close_spider(self, 'Finished.')
                 return
             self.page = 0
         self.set_checkpoint()
