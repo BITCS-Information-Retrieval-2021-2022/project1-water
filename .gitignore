@@ -1,6 +1,6 @@
 .idea
 
-# pdf及视频文件
+# pdf、视频、以及检查点
 storage/
 # 日志文件
 water_academic_crawler/water_academic_crawler.log
