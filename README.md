@@ -80,6 +80,43 @@ scrapy crawl <source> -s JOBDIR=../storage/<source>
 - 达到设定的终止条件爬虫自动终止
 - 两次输入`Ctrl+C`可强制停止，重新输入启动命令可断点续爬
 
+### 部分功能介绍
+
+1. 数据结构
+- 爬取到的数据结构示例如下
+```json
+{
+"_id":"d6c904b5e7842672b974f1a159ea31d9",
+"title":"Who's In Control? On Security Risks of Disjointed IoT Device Management Channels",
+"abstract":"...",
+"authors":["Yan Jia","Bin Yuan","Luyi Xing","Dongfang Zhao","Yifan Zhang","XiaoFeng Wang","Yijing Liu","Kaimin Zheng","Peyton Crnjak","Yuqing Zhang","Deqing Zou","Hai Jin"],
+"doi":"https://doi/10.1145/3460120.3484592",
+"url":"https://dl.acm.org/doi/10.1145/3460120.3484592",
+"year":"2021",
+"month":"11",
+"type":"conference",
+"venue":"CCS '21: Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security",
+"source":["ACM"],
+"video_url":"https://dl.acm.org/action/downloadSupplement?doi=10.1145%2F3460120.3484592&file=CCS21-fp326.mp4",
+"thumbnail_url":"https://videodelivery.net/eyJraWQiOiI3YjgzNTg3NDZlNWJmNDM0MjY5YzEwZTYwMDg0ZjViYiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI2NTU1Yjg2ZmI0NGJhZjQ1MjIyNDFhMmNlNzI0OTA2YSIsImtpZCI6IjdiODM1ODc0NmU1YmY0MzQyNjljMTBlNjAwODRmNWJiIiwiZXhwIjoxNjM4MzA1NzQ1fQ.uZj7i7RIiySy5Avp0EYvDmEF9kdBqVrLzG_IfQYMGN5VtQN0mYCvjsuB7eHSnNVjPe1jF8PfByqECcW6S4OsbJ0qdjzkdWF0c9Uj7ew4gp-yT4pJQ7Eciywy2J-Geon5J53RYw1lQacQT2SohnKZ7KzsLD8m5Kfy9g85aUuseVEbKckEpvwWY0mkPEaPdB0WAwK46wbEELnNdsOuXErRpff9C-pRObbwU1CrK3c-5HEFvsr8vHnDVkhzuXfDBrkSekhPqwefH6djpvyjl-OemfzKhjlybVgJXuZ6qJE-BBPXLPfwJNudOf_a1TBEd59HSaZoVCBYxEBfv8zifyIk6g/thumbnails/thumbnail.jpg?time=10.0s",
+"pdf_url":"https://dl.acm.org/doi/pdf/10.1145/3460120.3484592",
+"pdf_path":"storage/pdf/Whos_In_Control_On_Security_Risks_of_Disjointed_IoT_Device_Management_Channels.pdf",
+"inCitations":"0",
+"outCitations":"72"
+}
+```
+2. 低耦合的爬虫框架
+- 本工程绝大多数功能特性通过重写`scrapy`框架中的`pipeline`或`middleware`实现，事实上本工程中三个爬虫也完全使用同一套框架，尽可能保持了可复用与灵活性，故如果想为该爬虫框架添加新的数据源，只需要重写`spider`的prase方法和容器`item`即可。
+3. 启发式搜索策略
+部分并不提供按会议（期刊）分割的论文列表的数据库或资源获取途径（如`ScienceDirect API`），需要提供关键词对于数据库进行检索，故关键词的选择策略会对爬取到内容的质量产生较大的影响，在本工程中，通过设置关键词对论文题名进行检索，可以将该爬虫爬取的问题规约到图搜索问题，其中节点为论文信息。设计启发式搜索方式如下：
+- 初始化一个较为有代表性的关键词（如Transformer、Covid-19、Cell）等等，对数据库进行检索；
+- 对检索到的论文题目进行分词处理，去除无意义的助词（如A、the、of）等建立优先队列，优先关键字为词语出现的次数；
+- 对优先队列中的关键词有以下两种考量：
+	* 如果一个词语出现的频率越高，说明词语与当前检索的关键词关系越密切，对于该关键词进行搜索的结果大多会和当前的搜索结果相关，是对当前知识领域的纵向挖掘过程；
+	* 如果一个词语出现的频率低，说明词语与当前检索关键词关系不大，对于该关键词进行搜索的结果更可能和当前的搜索结果完全不同，是对知识领域之间的横向扩展过程；
+- 故需要对以上两者进行衡量，来选择一个兼顾深度与广度的爬取策略，在本工程中，选择超参数λ = 0.1 ，即在选择下一个关键词时有0.9的概率选择当前优先队列中队头的关键词，进行深度挖掘，有0.1的概率选择当前优先队列中队尾的关键词
+
+
 ### 运行截图
 
 ![crawler-running](https://s2.loli.net/2021/12/25/6a35OR4CNYjTWSx.jpg)
@@ -191,7 +228,7 @@ project1-water
 | 朱长昊 | 3120211053 | 搭建爬虫框架、负责爬取ACM Digital Library和SpringerLink、撰写文档 |
 | 王华章 | 3120211044 | 分析网页框架、参与爬取ACM Digital Library                    |
 |  黄鹏  | 3120211036 | 分析网页框架、参与爬取ACM Digital Library                    |
-| 张泽康 | 3120211082 | 搭建爬虫框架、负责爬取ScienceDirect                          |
+| 张泽康 | 3120211082 | 搭建爬虫框架、负责爬取ScienceDirect、撰写文档                          |
 | 赵山博 | 3120210999 | 负责搭建前端框架、参与爬取ACM Digital Library                |
 | 陈姣玉 | 3520210067 | 参与爬取ACM Digital Library                                  |
 
