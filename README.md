@@ -82,19 +82,29 @@ scrapy crawl <source> -s JOBDIR=../storage/<source>
 
 ### 运行截图
 
-![](images/crawler-running.jpg)
+![crawler-running](https://s2.loli.net/2021/12/25/6a35OR4CNYjTWSx.jpg)
 
-![](images/crawler-pdf.jpg)
+![crawler-pdf](https://s2.loli.net/2021/12/25/KS3vPEzZFmCpXQL.jpg)
 
 ## 可视化界面部分
 
 ### 功能
 
+1.Discover
 
+- KQL(kibana查询语言)查询
 
-### 依赖项
+- 基于条件筛选
 
+2.Dashboard展示
 
+### 依赖开源框架
+
+|                           软件/库                            |  版本  |
+| :----------------------------------------------------------: | :----: |
+| **[elasticsearch](https://github.com/elastic/elasticsearch)** | 7.15.1 |
+|       **[ kibana](https://github.com/elastic/kibana)**       | 7.15.1 |
+|     **[monstache](https://github.com/rwynn/monstache)**      |  6.77  |
 
 ### 使用方法
 
@@ -104,7 +114,25 @@ scrapy crawl <source> -s JOBDIR=../storage/<source>
 
 ### 运行截图
 
+1.Discover
 
+- KQL
+
+  ![Discover-KQL](https://s2.loli.net/2021/12/25/uwgGQ86lxpqFDOo.png)
+
+- 筛选
+
+  ![Discover-Filter](https://s2.loli.net/2021/12/25/1aCIjmNPkthisA3.png)
+
+2.Dashboard
+
+![dashboard1](https://s2.loli.net/2021/12/25/waMD7ZYjs3Q9mxd.png)
+
+![dashboard2](https://s2.loli.net/2021/12/25/lbdCoRaL7WtAvVH.png)
+
+![dashboard3](https://s2.loli.net/2021/12/25/SH2ebfnrv3L64kQ.png)
+
+![dashboard4](https://s2.loli.net/2021/12/25/yiEJ8UOlcHrWxCw.png)
 
 ## 项目结构
 
