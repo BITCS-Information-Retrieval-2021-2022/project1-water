@@ -130,6 +130,8 @@ class ScienceDirectPipeline:
         if spider.name != 'ScienceDirect':
             return item
 
+        return item
+
 
 class DeduplicatePipeline:
     def open_spider(self, spider):
