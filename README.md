@@ -196,3 +196,13 @@ project1-water
 | 陈姣玉 | 3520210067 | 参与爬取ACM Digital Library                                  |
 
 ## 成果总结
+- 论文总数 4,848,967
+  - ScienceDirect 3,312,967
+  - Springer 1,281,058
+  - ACM 261,284
+- 下载pdf
+  - 89,913篇
+  - 117 GB
+- 字段覆盖率
+  - ScienceDirect无摘要
+  - 其余两数据源全覆盖
