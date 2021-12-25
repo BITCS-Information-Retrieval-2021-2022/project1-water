@@ -7,7 +7,7 @@
 ## 爬虫部分
 
 ### 原理框架
-![](https://s2.loli.net/2021/12/25/XVznJiljf5GyTEW.png)
+![原理](https://s2.loli.net/2021/12/25/XVznJiljf5GyTEW.png)
 
 
 ### 依赖项
@@ -87,9 +87,6 @@
 ```
 
 4. 针对多个数据源中重复的论文，将其合并为一条数据，补全其他数据源中可能缺少的字段
-
-如上示例数据， //todo
-
 5. 支持增量式爬取
 6. 针对三种数据源设计相应规则，保证爬取结果不重不漏
 
@@ -143,9 +140,9 @@ scrapy crawl <source> -s JOBDIR=../storage/<source>
 
 ### 运行截图
 
-![crawler-running](https://s2.loli.net/2021/12/25/6a35OR4CNYjTWSx.jpg)
+![运行截图](https://s2.loli.net/2021/12/25/6a35OR4CNYjTWSx.jpg)
 
-![crawler-pdf](https://s2.loli.net/2021/12/25/KS3vPEzZFmCpXQL.jpg)
+![爬取的pdf](https://s2.loli.net/2021/12/25/KS3vPEzZFmCpXQL.jpg)
 
 ## 可视化界面部分
 
