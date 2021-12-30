@@ -164,12 +164,6 @@ scrapy crawl <source> -s JOBDIR=../storage/<source>
 |       [ kibana](https://github.com/elastic/kibana)        | 7.15.1 |
 |      [monstache](https://github.com/rwynn/monstache)      |  6.77  |
 
-### 使用方法
-
-1. 连接北理工**校园网**
-2. 打开浏览器，访问`http://10.108.21.50:5601/`
-3. 按需浏览、自定义查询范围
-
 ### 运行截图
 
 1.Discover
@@ -238,18 +232,6 @@ project1-water
         └─__pycache__
                 ...
 ```
-
-## 成员分工
-
-|  姓名  |    学号    | 分工                                                         |
-| :----: | :--------: | :----------------------------------------------------------- |
-|  顾骁  | 3120211034 | 组长。参与搭建前端框架、参与爬取SpringerLink、撰写文档       |
-| 朱长昊 | 3120211053 | 搭建爬虫框架、负责爬取ACM Digital Library和SpringerLink、撰写文档 |
-| 王华章 | 3120211044 | 分析网页框架、参与爬取ACM Digital Library                    |
-|  黄鹏  | 3120211036 | 分析网页框架、参与爬取ACM Digital Library                    |
-| 张泽康 | 3120211082 | 搭建爬虫框架、负责爬取ScienceDirect、撰写文档                          |
-| 赵山博 | 3120210999 | 负责搭建前端框架、参与爬取ACM Digital Library                |
-| 陈姣玉 | 3520210067 | 参与爬取ACM Digital Library                                  |
 
 ## 成果总结
 
